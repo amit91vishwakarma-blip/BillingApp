@@ -29,15 +29,12 @@ body { font-family: Arial; }
     background: #fff;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
+table { width:100%; border-collapse: collapse; }
 
 td, th {
-    border: 1px solid #000;
-    padding: 4px;
-    font-size: 13px;
+    border:1px solid #000;
+    padding:5px;
+    font-size:13px;
     vertical-align: top;
 }
 
@@ -45,9 +42,8 @@ td, th {
     background:#5d88b5;
     color:white;
     text-align:center;
-    font-weight:bold;
     font-size:16px;
-    padding:6px;
+    font-weight:bold;
 }
 
 .section {
@@ -59,32 +55,17 @@ td, th {
 .right { text-align:right; }
 
 input, select {
+    width:100%;
     border:none;
     outline:none;
-    width:100%;
-    font-size:13px;
 }
 
-/* COMPACT HEADER */
-.seller-box {
-    font-size:14px;
-    line-height:1.4;
-}
+/* compact header */
+.seller-box { font-size:14px; line-height:1.4; }
+.invoice-box { font-size:13px; }
+.invoice-box input { height:18px; }
 
-.invoice-box {
-    font-size:13px;
-    line-height:1.4;
-}
-
-.invoice-box input {
-    height:18px;
-    margin:2px 0;
-}
-
-/* LOGO */
-.logo {
-    width:100px;
-}
+.logo { width:100px; }
 </style>
 
 <script>
@@ -93,7 +74,6 @@ function fillProduct(sel){
 
     document.getElementById("hsn").value = opt.dataset.hsn;
     document.getElementById("rate").value = opt.dataset.price;
-
     document.getElementById("unit").value = opt.dataset.unit || "Piece";
 
     calculate();
@@ -122,6 +102,25 @@ function calculate(){
     document.getElementById("total").innerText = total.toFixed(2);
 
     document.getElementById("words").innerText = numberToWords(total);
+
+    // ===== GST SUMMARY =====
+    document.getElementById("hsn_summary").innerText = document.getElementById("hsn").value;
+
+    document.getElementById("taxable_summary").innerText = amount.toFixed(2);
+    document.getElementById("taxable_total").innerText = amount.toFixed(2);
+
+    document.getElementById("cgst_rate_display").innerText = cgstRate + "%";
+    document.getElementById("sgst_rate_display").innerText = sgstRate + "%";
+
+    document.getElementById("cgst_summary").innerText = cgst.toFixed(2);
+    document.getElementById("sgst_summary").innerText = sgst.toFixed(2);
+
+    document.getElementById("cgst_total").innerText = cgst.toFixed(2);
+    document.getElementById("sgst_total").innerText = sgst.toFixed(2);
+
+    let totalTax = cgst + sgst;
+    document.getElementById("total_tax_summary").innerText = totalTax.toFixed(2);
+    document.getElementById("final_tax_total").innerText = totalTax.toFixed(2);
 }
 
 function numberToWords(num){
@@ -174,14 +173,39 @@ function numberToWords(num){
 </td>
 
 <td colspan="3" class="invoice-box">
-<b>Invoice No:</b> <input><br>
-<b>Date:</b> <input type="date"><br>
-<b>E-Way Bill:</b> <input><br>
-<b>Dispatch:</b> <input><br>
-<b>Dispatch Doc:</b> <input><br>
-<b>Destination:</b> <input><br>
-<b>Delivery Date:</b> <input type="date"><br>
-<b>Vehicle No:</b> <input>
+<table style="width:100%; border:none;">
+<tr>
+<td style="border:none;"><b>Invoice No:</b></td>
+<td style="border:none;"><input></td>
+
+<td style="border:none;"><b>Dispatch Doc:</b></td>
+<td style="border:none;"><input></td>
+</tr>
+
+<tr>
+<td style="border:none;"><b>Date:</b></td>
+<td style="border:none;"><input type="date"></td>
+
+<td style="border:none;"><b>Destination:</b></td>
+<td style="border:none;"><input></td>
+</tr>
+
+<tr>
+<td style="border:none;"><b>E-Way Bill:</b></td>
+<td style="border:none;"><input></td>
+
+<td style="border:none;"><b>Delivery Date:</b></td>
+<td style="border:none;"><input type="date"></td>
+</tr>
+
+<tr>
+<td style="border:none;"><b>Dispatch:</b></td>
+<td style="border:none;"><input></td>
+
+<td style="border:none;"><b>Vehicle No:</b></td>
+<td style="border:none;"><input></td>
+</tr>
+</table>
 </td>
 
 </tr>
@@ -289,36 +313,51 @@ data-unit="<?php echo $p['unit'] ?? 'Piece'; ?>">
 </tr>
 </table>
 
-<!-- WORD -->
+<!-- AMOUNT IN WORD -->
 <table>
 <tr>
 <td><b>Amount in words:</b> <span id="words"></span></td>
 </tr>
 </table>
 
-<!-- TERMS -->
+<!-- GST SUMMARY TABLE -->
 <table>
-<tr>
-<td>
-<b>Terms and conditions</b><br>
-1. Goods once sold will not be returned.<br>
-2. Warranty as per company policy.<br>
-3. Subject to jurisdiction.
-</td>
+<tr class="section center">
+<th>HSN/SAC</th>
+<th>Taxable Amount</th>
+<th colspan="2">CGST</th>
+<th colspan="2">SGST</th>
+<th>Total Tax Amount</th>
 </tr>
-</table>
 
-<!-- SIGN -->
-<table>
-<tr>
-<td class="center">Customer Signature</td>
-<td class="center">Authorised Signature</td>
+<tr class="section center">
+<th></th>
+<th>Amount</th>
+<th>Rate</th>
+<th>Amount</th>
+<th>Rate</th>
+<th>Amount</th>
+<th></th>
 </tr>
-</table>
 
-<table>
-<tr class="header">
-<td>This is computer generated invoice</td>
+<tr class="center">
+<td id="hsn_summary">-</td>
+<td id="taxable_summary">0.00</td>
+<td id="cgst_rate_display">0%</td>
+<td id="cgst_summary">0.00</td>
+<td id="sgst_rate_display">0%</td>
+<td id="sgst_summary">0.00</td>
+<td id="total_tax_summary">0.00</td>
+</tr>
+
+<tr class="center">
+<td><b>Total</b></td>
+<td id="taxable_total">0.00</td>
+<td></td>
+<td id="cgst_total">0.00</td>
+<td></td>
+<td id="sgst_total">0.00</td>
+<td id="final_tax_total">0.00</td>
 </tr>
 </table>
 
